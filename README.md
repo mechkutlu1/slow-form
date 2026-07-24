@@ -82,25 +82,6 @@ the continuity score.
 If your feet are not visible the app says so and stops scoring the leg
 quantities rather than marking you down for something it cannot see.
 
-## Files
-
-| File | Purpose |
-|---|---|
-| `index.html` | The entire app: form library, kinematics, renderer, pose pipeline, scoring, report |
-| `manifest.webmanifest` | Home-screen install |
-| `sw.js` | Offline app shell, plus opportunistic caching of the pose model |
-| `icon-*.png`, `apple-touch-icon.png`, `favicon-64.png` | Icons, drawn from the app's own Single Whip posture |
-| `.nojekyll` | Stops GitHub Pages from processing the folder |
-
-## Deploy to GitHub Pages
-
-1. Create a public repository, for example `slow-form`.
-2. Upload every file in this folder and commit.
-3. **Settings → Pages → Build and deployment**: Source *Deploy from a branch*,
-   Branch `main`, Folder `/ (root)`. Save.
-4. After a minute it is live at `https://<username>.github.io/slow-form/`.
-
-The camera requires HTTPS, which GitHub Pages provides.
 
 ## Honest limits
 
