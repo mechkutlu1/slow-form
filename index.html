@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1">
+<title>Slow Form — a tai chi coach that shows you the posture</title>
+<meta name="description" content="Learn eight postures of the Yang-style tai chi short form. An ink-brush coach demonstrates each posture, your camera traces your own figure over it, and every posture is scored on shape, weight, tempo and stillness. Runs entirely on your device.">
+<meta name="theme-color" content="#0E1512">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Slow Form">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Karla:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0E1512; --ink-2:#131E19; --panel:#17231E; --panel-2:#1E2C26; --line:#2B3B34;
+  --silk:#EDE7D8; --silk-dim:#8C9A90; --silk-faint:#5C6B62;
+  --cinnabar:#C8503C; --cinnabar-lit:#E4694F; --cinnabar-soft:rgba(200,80,60,.16);
+  --jade:#63C09A; --jade-soft:rgba(99,192,154,.16);
+  --gold:#C9A24A;
+  --display:"Cormorant Garamond",Georgia,serif;
+  --body:"Karla",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--ink); color:var(--silk); font-family:var(--body); font-size:15px; line-height:1.55;
+  -webkit-tap-highlight-color:transparent; overflow:hidden; overscroll-behavior:none;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.app{
+  height:100dvh; display:flex; flex-direction:column;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  max-width:560px; margin:0 auto; position:relative;
+}
+.screen{display:none;flex:1;min-height:0;flex-direction:column}
+.screen.on{display:flex}
+
+/* ---------------- type ---------------- */
+.eyebrow{font-family:var(--mono);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--silk-faint)}
+h1{font-family:var(--display);font-weight:600;font-size:2.9rem;line-height:1.02;letter-spacing:-.01em}
+h1 em{font-style:italic;color:var(--cinnabar-lit);font-weight:400}
+h2{font-family:var(--display);font-weight:600;font-size:1.45rem;line-height:1.15}
+h3{font-family:var(--body);font-weight:700;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;color:var(--silk-dim)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.dim{color:var(--silk-dim)}
+
+/* ---------------- home ---------------- */
+.home-scroll{flex:1;overflow-y:auto;padding:1.6rem 1.25rem 1.5rem;-webkit-overflow-scrolling:touch}
+.brand{display:flex;align-items:baseline;gap:.7rem;margin-bottom:1.4rem}
+.seal{
+  width:38px;height:38px;flex:none;border-radius:5px;background:var(--cinnabar);
+  display:grid;place-items:center;font-family:var(--display);font-size:1.35rem;color:#0E1512;
+  transform:translateY(4px);
+}
+.lede{margin:.9rem 0 1.6rem;color:var(--silk-dim);max-width:34ch}
+.field{margin-bottom:1.35rem}
+.field h3{margin-bottom:.55rem}
+.opts{display:flex;gap:.45rem;flex-wrap:wrap}
+.opt{
+  border:1px solid var(--line);border-radius:999px;padding:.42rem .95rem;font-size:.86rem;
+  color:var(--silk-dim);transition:.16s;
+}
+.opt[aria-pressed="true"]{background:var(--cinnabar-soft);border-color:var(--cinnabar);color:var(--silk)}
+.mode-card{
+  display:block;width:100%;text-align:left;border:1px solid var(--line);border-radius:var(--r);
+  padding:.85rem 1rem;margin-bottom:.55rem;transition:.16s;background:var(--panel);
+}
+.mode-card[aria-pressed="true"]{border-color:var(--cinnabar);background:var(--panel-2)}
+.mode-card strong{font-family:var(--display);font-size:1.2rem;font-weight:600;display:block}
+.mode-card span{font-size:.82rem;color:var(--silk-dim)}
+.cta{
+  width:100%;background:var(--cinnabar);color:#0E1512;font-weight:700;letter-spacing:.02em;
+  border-radius:var(--r);padding:.95rem;font-size:1rem;margin-top:.4rem;
+}
+.cta:disabled{opacity:.4}
+.cta.ghost{background:none;border:1px solid var(--line);color:var(--silk);font-weight:500}
+.note{font-size:.78rem;color:var(--silk-faint);margin-top:.8rem;line-height:1.5}
+.rowlink{display:flex;gap:.5rem;margin-top:.7rem}
+.rowlink button{flex:1}
+
+/* posture index on the home screen */
+.index{border-top:1px solid var(--line);margin-top:1.4rem;padding-top:1rem}
+.index li{list-style:none;display:flex;gap:.7rem;align-items:baseline;padding:.34rem 0;border-bottom:1px dashed var(--line)}
+.index li:last-child{border-bottom:0}
+.index .han{font-family:var(--display);font-size:1.05rem;color:var(--cinnabar-lit);width:1.4rem;flex:none;text-align:center}
+.index .en{flex:1;font-size:.9rem}
+.index .py{font-family:var(--mono);font-size:.68rem;color:var(--silk-faint);letter-spacing:.04em}
+
+/* ---------------- stage ---------------- */
+.bar{display:flex;align-items:center;gap:.7rem;padding:.6rem .9rem;border-bottom:1px solid var(--line);flex:none}
+.bar .back{font-size:1.3rem;line-height:1;color:var(--silk-dim);padding:.2rem .35rem}
+.bar-title{flex:1;min-width:0}
+.bar-title strong{display:block;font-family:var(--display);font-size:1.15rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-title span{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--silk-faint)}
+.chip{font-family:var(--mono);font-size:.68rem;padding:.24rem .5rem;border:1px solid var(--line);border-radius:6px;color:var(--silk-dim)}
+
+.stage{flex:1;min-height:0;position:relative;display:flex;flex-direction:column}
+#coach{flex:1;min-height:0;width:100%;display:block;touch-action:none}
+
+/* the seal column: the form as a vertical sequence, filling as you go */
+.seal-col{
+  position:absolute;left:.55rem;top:.7rem;bottom:.7rem;width:26px;
+  display:flex;flex-direction:column;gap:.28rem;z-index:3;pointer-events:none;
+}
+.seal-col b{
+  flex:1;border-radius:4px;border:1px solid var(--line);background:rgba(14,21,18,.45);
+  font-family:var(--display);font-weight:400;font-size:.82rem;color:var(--silk-faint);
+  display:grid;place-items:center;transition:.3s;
+}
+.seal-col b.done{background:rgba(200,80,60,.35);border-color:var(--cinnabar);color:var(--silk)}
+.seal-col b.now{background:var(--cinnabar);border-color:var(--cinnabar-lit);color:#0E1512;font-weight:600}
+
+/* picture-in-picture camera */
+.pip{
+  position:absolute;right:.6rem;top:.7rem;width:84px;height:112px;border-radius:10px;overflow:hidden;
+  border:1px solid var(--line);background:#000;z-index:3;
+}
+.pip video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.pip.hide{display:none}
+
+/* live readouts */
+.hud{position:absolute;left:0;right:0;bottom:0;padding:.7rem .9rem;z-index:3;
+  background:linear-gradient(to top,rgba(14,21,18,.94),rgba(14,21,18,0))}
+.cue{font-family:var(--display);font-size:1.12rem;line-height:1.3;min-height:2.6em;margin-bottom:.55rem}
+.meter{height:6px;border-radius:3px;background:var(--panel-2);overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--jade);transition:width .12s linear}
+.meter-row{display:flex;align-items:center;gap:.6rem}
+.meter-row .meter{flex:1}
+.meter-row .num{font-size:.8rem;color:var(--silk-dim);width:2.4rem;text-align:right}
+.tempo{display:flex;align-items:center;gap:.4rem;font-family:var(--mono);font-size:.66rem;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--silk-faint);margin-top:.45rem}
+.tempo i{width:6px;height:6px;border-radius:50%;background:var(--silk-faint);display:block}
+.tempo i.ok{background:var(--jade)} .tempo i.warn{background:var(--gold)}
+
+.controls{flex:none;display:flex;gap:.5rem;padding:.7rem .9rem calc(.7rem + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.controls button{flex:1;border:1px solid var(--line);border-radius:10px;padding:.6rem;font-size:.86rem;color:var(--silk-dim)}
+.controls button.prime{background:var(--cinnabar);border-color:var(--cinnabar);color:#0E1512;font-weight:700}
+
+/* learn-mode explanation panel */
+.teach{flex:none;padding:.85rem .95rem;border-top:1px solid var(--line);max-height:34%;overflow-y:auto}
+.teach p{font-size:.88rem;color:var(--silk-dim);margin-bottom:.5rem}
+.teach .cuelist{list-style:none}
+.teach .cuelist li{font-size:.85rem;padding:.3rem 0 .3rem .95rem;position:relative;color:var(--silk)}
+.teach .cuelist li::before{content:"";position:absolute;left:0;top:.72em;width:5px;height:1px;background:var(--cinnabar)}
+
+/* ---------------- overlays ---------------- */
+.veil{position:absolute;inset:0;background:rgba(14,21,18,.93);z-index:20;display:none;
+  flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem 1.6rem}
+.veil.on{display:flex}
+.veil .big{font-family:var(--display);font-size:4.6rem;line-height:1;color:var(--cinnabar-lit)}
+.veil p{color:var(--silk-dim);margin-top:.7rem;max-width:28ch}
+
+/* ---------------- report ---------------- */
+.report{flex:1;overflow-y:auto;padding:1.4rem 1.25rem 2rem}
+.grade{display:flex;align-items:flex-end;gap:1rem;padding-bottom:1.1rem;border-bottom:1px solid var(--line)}
+.grade .score{font-family:var(--display);font-size:4.4rem;line-height:.85;font-weight:600}
+.grade .of{font-family:var(--mono);font-size:.7rem;color:var(--silk-faint);letter-spacing:.16em}
+.grade .verdict{flex:1;font-family:var(--display);font-style:italic;font-size:1.15rem;color:var(--silk-dim)}
+.quad{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;margin:1.1rem 0}
+.quad div{border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem}
+.quad .k{font-family:var(--mono);font-size:.62rem;letter-spacing:.13em;text-transform:uppercase;color:var(--silk-faint)}
+.quad .v{font-family:var(--display);font-size:1.7rem;font-weight:600;line-height:1.1}
+.bars{margin-top:.4rem}
+.bars .row{display:grid;grid-template-columns:1fr auto;gap:.5rem;align-items:center;padding:.42rem 0}
+.bars .lbl{font-size:.86rem}
+.bars .lbl small{display:block;font-family:var(--mono);font-size:.62rem;color:var(--silk-faint);letter-spacing:.06em}
+.bars .track{grid-column:1/-1;height:4px;border-radius:2px;background:var(--panel-2);overflow:hidden}
+.bars .track i{display:block;height:100%;background:var(--jade)}
+.bars .val{font-family:var(--mono);font-size:.82rem;color:var(--silk-dim)}
+.tip{border-left:2px solid var(--cinnabar);padding:.2rem 0 .2rem .8rem;margin:1.2rem 0 .4rem}
+.tip h3{margin-bottom:.3rem}
+.tip p{font-family:var(--display);font-size:1.18rem;line-height:1.35}
+.sep{height:1px;background:var(--line);margin:1.3rem 0}
+
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+:focus-visible{outline:2px solid var(--jade);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ============ HOME ============ -->
+<section class="screen on" id="scHome">
+  <div class="home-scroll">
+    <div class="brand">
+      <div class="seal">慢</div>
+      <div>
+        <div class="eyebrow">Yang style · short form</div>
+        <h1>Slow <em>Form</em></h1>
+      </div>
+    </div>
+
+    <p class="lede">Eight postures, demonstrated by a figure you can stand inside. Your camera traces your own outline over the coach so you can see the gap, and every posture is scored on shape, weight, tempo and stillness.</p>
+
+    <div class="field">
+      <h3>What do you want to do</h3>
+      <button class="mode-card" data-mode="learn" aria-pressed="true">
+        <strong>Study a posture</strong>
+        <span>One posture at a time, looping slowly, with the coaching points written out. No scoring.</span>
+      </button>
+      <button class="mode-card" data-mode="practice" aria-pressed="false">
+        <strong>Run the form</strong>
+        <span>Follow the coach through the whole sequence. Scored, with a report at the end.</span>
+      </button>
+    </div>
+
+    <div class="field" id="fieldPosture">
+      <h3>Posture</h3>
+      <div class="opts" id="postureOpts"></div>
+    </div>
+
+    <div class="field">
+      <h3>Pace</h3>
+      <div class="opts" id="speedOpts">
+        <button class="opt" data-speed="0.6">Very slow</button>
+        <button class="opt" data-speed="0.8" aria-pressed="true">Slow</button>
+        <button class="opt" data-speed="1">Standard</button>
+        <button class="opt" data-speed="1.3">Brisk</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <h3>Options</h3>
+      <div class="opts">
+        <button class="opt" id="optVoice" aria-pressed="true">Spoken cues</button>
+        <button class="opt" id="optSkel" aria-pressed="true">Show my outline</button>
+        <button class="opt" id="optPip" aria-pressed="false">Camera preview</button>
+      </div>
+    </div>
+
+    <button class="cta" id="btnBegin">Start camera and begin</button>
+    <div class="rowlink">
+      <button class="cta ghost" id="btnNoCam">Watch without camera</button>
+    </div>
+    <p class="note" id="camNote">The camera never leaves your phone. Pose estimation runs on-device and nothing is recorded, uploaded or stored. Stand back far enough that your feet are in the frame, and give yourself about two metres of clear floor.</p>
+
+    <div class="index">
+      <h3 style="margin-bottom:.6rem">The sequence</h3>
+      <ul id="indexList"></ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STAGE ============ -->
+<section class="screen" id="scStage">
+  <div class="bar">
+    <button class="back" id="btnBack" aria-label="Back to the menu">‹</button>
+    <div class="bar-title">
+      <strong id="stName">—</strong>
+      <span id="stPinyin">—</span>
+    </div>
+    <span class="chip" id="stChip">—</span>
+  </div>
+
+  <div class="stage">
+    <canvas id="coach"></canvas>
+    <div class="seal-col" id="sealCol"></div>
+    <div class="pip hide" id="pip"><video id="vid" playsinline muted></video></div>
+    <div class="hud" id="hud">
+      <p class="cue" id="cueText">—</p>
+      <div class="meter-row" id="matchRow">
+        <div class="meter"><i id="matchBar"></i></div>
+        <span class="num" id="matchNum">—</span>
+      </div>
+      <div class="tempo" id="tempoRow"><i id="tempoDot"></i><span id="tempoText">waiting</span></div>
+    </div>
+    <div class="veil" id="veil">
+      <div class="big" id="veilBig">3</div>
+      <p id="veilMsg">Stand where your whole body fits in the frame.</p>
+    </div>
+  </div>
+
+  <div class="teach" id="teach" style="display:none">
+    <p id="teachIdea">—</p>
+    <ul class="cuelist" id="teachCues"></ul>
+  </div>
+
+  <div class="controls">
+    <button id="btnPrev">Previous</button>
+    <button id="btnPlay" class="prime">Pause</button>
+    <button id="btnNext">Next</button>
+  </div>
+</section>
+
+<!-- ============ REPORT ============ -->
+<section class="screen" id="scReport">
+  <div class="bar">
+    <button class="back" id="btnBack2" aria-label="Back to the menu">‹</button>
+    <div class="bar-title"><strong>Practice report</strong><span id="repWhen">—</span></div>
+  </div>
+  <div class="report">
+    <div class="grade">
+      <div><div class="score num" id="repScore">—</div><div class="of">Out of 100</div></div>
+      <div class="verdict" id="repVerdict">—</div>
+    </div>
+
+    <div class="quad">
+      <div><div class="k">Tempo</div><div class="v num" id="repTempo">—</div><div class="k" id="repTempoNote">—</div></div>
+      <div><div class="k">Stillness</div><div class="v num" id="repStill">—</div><div class="k" id="repStillNote">—</div></div>
+      <div><div class="k">Continuity</div><div class="v num" id="repSmooth">—</div><div class="k" id="repSmoothNote">—</div></div>
+      <div><div class="k">Upright</div><div class="v num" id="repUpright">—</div><div class="k" id="repUprightNote">—</div></div>
+    </div>
+
+    <h3>Posture by posture</h3>
+    <div class="bars" id="repPostures"></div>
+
+    <div class="sep"></div>
+    <h3>Where the shape drifted</h3>
+    <div class="bars" id="repChecks"></div>
+
+    <div class="tip">
+      <h3>Work on this next</h3>
+      <p id="repTip">—</p>
+    </div>
+
+    <button class="cta" id="btnAgain" style="margin-top:1.2rem">Run the form again</button>
+    <button class="cta ghost" id="btnHome" style="margin-top:.5rem">Back to the menu</button>
+    <p class="note">Scores compare your joint angles, hand heights and hip position against the coach's, all measured relative to your own torso length so your distance from the camera does not matter. They describe the shape you made, not whether your tai chi is good.</p>
+  </div>
+</section>
+
+</div>
+<script type="module">
+/* MediaPipe is imported lazily, only when the camera is asked for, so the coach,
+   study mode and the whole shell keep working with no network at all. */
+
+/* ==========================================================================
+   1. FORM LIBRARY
+   Arms are absolute segment angles (deg, 0 = screen right, 90 = up).
+   Legs are ankle targets relative to the hip centre, solved by two-link IK —
+   so moving both feet right of the pelvis is literally how weight shifts onto
+   the left leg. The coach figure and the scorer read this one spec.
+   ========================================================================== */
+const D = Math.PI / 180;
+const BODY = { pelvisHalf:0.050, spine:0.285, neck:0.055, headR:0.058, shoulderHalf:0.098,
+  upperArm:0.165, foreArm:0.150, hand:0.045, thigh:0.238, shin:0.238, foot:0.072 };
+
+/* Keyframe schema
+   torso    spine angle, 90 = upright, <90 leans right on screen
+   hL/hR    WRIST target relative to the shoulder centre, in body-height units.
+            y: 0 shoulder, +0.09 temple, -0.10 chest, -0.20 navel, -0.33 thigh.
+   bL/bR    how bent the arm is drawn, 0..1. Tai chi reaches forward constantly and
+            a camera cannot see depth, so a forward reach is drawn the way it is
+            actually seen from the front: straight but shortened. 0 = fully
+            foreshortened and straight, 1 = a natural dropped-elbow bend.
+   ftL/ftR  ANKLE target relative to the hip centre. Moving both feet right of the
+            pelvis is exactly how weight settles onto the left leg.
+   Arms and legs are both solved by two-link IK, so this one spec drives the coach
+   figure and the scorer alike. */
+const KF = (o) => Object.assign({
+  torso:90, hL:{x:-0.13,y:-0.33}, hR:{x:0.13,y:-0.33}, bL:0.45, bR:0.45,
+  ftL:{x:-0.095,y:-0.455}, ftR:{x:0.095,y:-0.455},
+  breath:'in', hold:1.2, glide:2.6, cue:'',
+}, o);
+
+const FORM = [
+  { id:'qishi', han:'起', name:'Commencing', pinyin:'Qǐ Shì',
+    idea:'Everything the form does later is already here: sink, breathe low, and let the arms be carried up by the legs releasing rather than lifted by the shoulders.',
+    frames:[
+      KF({ hold:2.0, glide:1.6, breath:'in', cue:'Feet shoulder width, weight even, crown lifted, arms hanging.' }),
+      KF({ hL:{x:-0.16,y:-0.02}, hR:{x:0.16,y:-0.02}, bL:0.20, bR:0.20,
+           ftL:{x:-0.095,y:-0.450}, ftR:{x:0.095,y:-0.450},
+           breath:'in', hold:1.4, glide:3.0, cue:'Wrists float forward to shoulder height, elbows stay heavy.' }),
+      KF({ hL:{x:-0.15,y:-0.20}, hR:{x:0.15,y:-0.20}, bL:0.90, bR:0.90,
+           ftL:{x:-0.100,y:-0.428}, ftR:{x:0.100,y:-0.428},
+           breath:'out', hold:1.6, glide:3.0, cue:'Press the palms down to the navel as the knees bend.' }),
+    ]},
+
+  { id:'yema', han:'野', name:"Parting the Wild Horse's Mane", pinyin:'Yě Mǎ Fēn Zōng',
+    idea:'A wide diagonal opening. One hand rises past the shoulder while the other sinks by the hip, the two split apart by the turn of the waist rather than by the arms.',
+    frames:[
+      KF({ hL:{x:-0.10,y:-0.06}, hR:{x:-0.04,y:-0.23}, bL:1.0, bR:1.0,
+           ftL:{x:-0.060,y:-0.442}, ftR:{x:0.130,y:-0.442},
+           breath:'in', hold:1.2, glide:2.8, cue:'Hold the ball: left hand above, right hand below.' }),
+      KF({ torso:86, hL:{x:-0.29,y:0.02}, hR:{x:0.15,y:-0.31}, bL:0.25, bR:0.70,
+           ftL:{x:-0.040,y:-0.418}, ftR:{x:0.260,y:-0.430},
+           breath:'out', hold:1.6, glide:3.4, cue:'Bow stance. Left hand splits up and out, right hand sinks to the hip.' }),
+      KF({ torso:94, hL:{x:-0.15,y:-0.31}, hR:{x:0.29,y:0.02}, bL:0.70, bR:0.25,
+           ftL:{x:-0.260,y:-0.430}, ftR:{x:0.040,y:-0.418},
+           breath:'out', hold:1.6, glide:4.0, cue:'Change sides. The waist turns first, the hands only follow.' }),
+    ]},
+
+  { id:'baihe', han:'鶴', name:'White Crane Spreads its Wings', pinyin:'Bái Hè Liàng Chì',
+    idea:'Almost all the weight sits on the back leg with the front toe barely touching. One hand lifts to the temple, the other settles by the thigh, and the chest stays soft between them.',
+    frames:[
+      KF({ torso:92, hL:{x:-0.04,y:-0.23}, hR:{x:0.10,y:-0.05}, bL:1.0, bR:1.0,
+           ftL:{x:-0.050,y:-0.445}, ftR:{x:0.140,y:-0.445},
+           breath:'in', hold:1.2, glide:2.6, cue:'Gather the ball in front of the chest.' }),
+      KF({ torso:90, hL:{x:-0.17,y:-0.33}, hR:{x:0.19,y:0.10}, bL:0.60, bR:0.90,
+           ftL:{x:-0.020,y:-0.435}, ftR:{x:0.220,y:-0.420},
+           breath:'out', hold:2.0, glide:3.2, cue:'Right hand rises to the temple, left hand settles by the thigh, front toe light.' }),
+    ]},
+
+  { id:'louxi', han:'摟', name:'Brush Knee and Twist Step', pinyin:'Lōu Xī Ǎo Bù',
+    idea:'One palm brushes across the knee while the opposite palm pushes forward at chest height. The push is driven from the back leg through a turning waist, never from the shoulder.',
+    frames:[
+      KF({ torso:94, hL:{x:-0.05,y:-0.20}, hR:{x:0.23,y:0.08}, bL:1.0, bR:0.60,
+           ftL:{x:-0.220,y:-0.440}, ftR:{x:0.040,y:-0.435},
+           breath:'in', hold:1.2, glide:2.8, cue:'Right hand circles back and up past the ear.' }),
+      KF({ torso:90, hL:{x:-0.18,y:-0.33}, hR:{x:0.17,y:-0.06}, bL:0.60, bR:0.35,
+           ftL:{x:-0.050,y:-0.415}, ftR:{x:0.270,y:-0.428},
+           breath:'out', hold:1.8, glide:3.4, cue:'Left palm brushes past the knee, right palm pushes out level with the chest.' }),
+      KF({ torso:90, hL:{x:-0.17,y:-0.06}, hR:{x:0.18,y:-0.33}, bL:0.35, bR:0.60,
+           ftL:{x:-0.270,y:-0.428}, ftR:{x:0.050,y:-0.415},
+           breath:'out', hold:1.8, glide:4.0, cue:'Step through and repeat on the other side.' }),
+    ]},
+
+  { id:'yunshou', han:'雲', name:'Cloud Hands', pinyin:'Yún Shǒu',
+    idea:'The hands pass each other in front of the body like two slow wheels while the weight rolls from foot to foot. The waist turns; the arms are only carried along.',
+    frames:[
+      KF({ torso:86, hL:{x:-0.16,y:0.07}, hR:{x:-0.05,y:-0.22}, bL:0.90, bR:1.0,
+           ftL:{x:-0.030,y:-0.438}, ftR:{x:0.210,y:-0.438},
+           breath:'in', hold:1.2, glide:2.6, cue:'Left hand at eye height, right hand at the navel, turn left.' }),
+      KF({ torso:90, hL:{x:-0.06,y:-0.04}, hR:{x:0.06,y:-0.20}, bL:1.0, bR:1.0,
+           ftL:{x:-0.120,y:-0.442}, ftR:{x:0.120,y:-0.442},
+           breath:'out', hold:0.8, glide:2.2, cue:'The hands cross at the centre line as the weight passes through.' }),
+      KF({ torso:94, hL:{x:0.05,y:-0.22}, hR:{x:0.16,y:0.07}, bL:1.0, bR:0.90,
+           ftL:{x:-0.210,y:-0.438}, ftR:{x:0.030,y:-0.438},
+           breath:'in', hold:1.2, glide:2.6, cue:'Now the right hand leads at eye height, turn right.' }),
+    ]},
+
+  { id:'danbian', han:'鞭', name:'Single Whip', pinyin:'Dān Biān',
+    idea:'The back hand forms a hook while the front palm turns over and extends. Both arms stretch one long line through an open chest, and the back leg is straight but never locked.',
+    frames:[
+      KF({ torso:92, hL:{x:-0.06,y:-0.12}, hR:{x:0.13,y:0.01}, bL:1.0, bR:0.90,
+           ftL:{x:-0.050,y:-0.440}, ftR:{x:0.160,y:-0.440},
+           breath:'in', hold:1.2, glide:2.8, cue:'Gather in, the right hand begins to form the hook.' }),
+      KF({ torso:90, hL:{x:-0.30,y:-0.01}, hR:{x:0.30,y:0.03}, bL:0.20, bR:0.20,
+           ftL:{x:-0.040,y:-0.410}, ftR:{x:0.290,y:-0.425},
+           breath:'out', hold:2.2, glide:3.6, cue:'Left palm turns over and pushes out, right hook stretches away behind.' }),
+    ]},
+
+  { id:'jinji', han:'雞', name:'Golden Rooster Stands on One Leg', pinyin:'Jīn Jī Dú Lì',
+    idea:'The whole body balances on one leg while the opposite knee and hand lift together. Root down through the standing foot completely before anything is allowed to rise.',
+    frames:[
+      KF({ torso:90, hL:{x:-0.13,y:-0.31}, hR:{x:0.13,y:-0.31}, bL:0.50, bR:0.50,
+           ftL:{x:-0.020,y:-0.445}, ftR:{x:0.180,y:-0.445},
+           breath:'in', hold:1.4, glide:2.8, cue:'Settle everything onto the left leg first.' }),
+      KF({ torso:90, hL:{x:-0.15,y:-0.32}, hR:{x:0.09,y:0.11}, bL:0.50, bR:1.0,
+           ftL:{x:0.000,y:-0.452}, ftR:{x:0.110,y:-0.200},
+           breath:'in', hold:2.4, glide:3.0, cue:'Right knee and right hand lift together, left hand rests by the thigh.' }),
+    ]},
+
+  { id:'shoushi', han:'收', name:'Closing', pinyin:'Shōu Shì',
+    idea:'The arms open, turn over, and sink. The form ends exactly where it began, with the breath settled below the navel and the weight even again.',
+    frames:[
+      KF({ torso:90, hL:{x:-0.30,y:-0.02}, hR:{x:0.30,y:-0.02}, bL:0.25, bR:0.25,
+           ftL:{x:-0.100,y:-0.442}, ftR:{x:0.100,y:-0.442},
+           breath:'in', hold:1.4, glide:3.0, cue:'Arms open wide to the sides at shoulder height, palms down.' }),
+      KF({ torso:90, hL:{x:-0.15,y:-0.09}, hR:{x:0.15,y:-0.09}, bL:0.90, bR:0.90,
+           ftL:{x:-0.095,y:-0.450}, ftR:{x:0.095,y:-0.450},
+           breath:'out', hold:1.6, glide:3.0, cue:'Draw the palms in and press them slowly down.' }),
+      KF({ hold:2.4, glide:2.4, breath:'out', cue:'Stand. Weight even, arms hanging, breath low.' }),
+    ]},
+];
+
+const NEUTRAL = KF({});
+
+/* ==========================================================================
+   2. KINEMATICS
+   ========================================================================== */
+const P = (x,y) => ({x,y});
+const step = (p,a,l) => P(p.x + Math.cos(a*D)*l, p.y + Math.sin(a*D)*l);
+const wrap = (d) => ((d+180)%360+360)%360-180;
+const segAng = (a,b) => Math.atan2(b.y-a.y, b.x-a.x)/D;
+const jointAng = (a,b,c) => Math.abs(wrap(segAng(b,a)-segAng(b,c)));
+const clamp = (v,a,b) => v<a?a:v>b?b:v;
+
+/* two-link IK. `pick` chooses between the two elbow/knee solutions. */
+function ik2(root, target, l1, l2, pick){
+  let dx = target.x-root.x, dy = target.y-root.y, d = Math.hypot(dx,dy);
+  const dmax=(l1+l2)*0.995, dmin=Math.abs(l1-l2)+1e-4;
+  if(d>dmax){ const s=dmax/d; dx*=s; dy*=s; d=dmax; }
+  if(d<dmin){ const s=dmin/(d||1e-6); dx*=s; dy*=s; d=dmin; }
+  const end=P(root.x+dx, root.y+dy), base=Math.atan2(dy,dx)/D;
+  const ca=clamp((d*d+l1*l1-l2*l2)/(2*d*l1),-1,1), al=Math.acos(ca)/D;
+  const j1=step(root,base+al,l1), j2=step(root,base-al,l1);
+  return { joint: pick(j1,j2), end };
+}
+/* An arm is drawn at a fraction of its true length so that reaching towards the
+   camera reads as a short straight arm rather than an impossible fold. */
+function armIK(sh, target, bend){
+  const full = BODY.upperArm + BODY.foreArm;
+  const d = Math.hypot(target.x-sh.x, target.y-sh.y);
+  const ext = 1 - 0.17*clamp(bend,0,1);
+  const k = clamp(d/(full*ext), 0.30, 1);
+  const r = ik2(sh, target, BODY.upperArm*k, BODY.foreArm*k, (a,b)=> a.y<b.y ? a : b);
+  return { elbow:r.joint, wrist:r.end, k };
+}
+
+function fk(k, B=BODY){
+  const hipMid=P(0,0), shMid=step(hipMid,k.torso,B.spine), perp=k.torso-90;
+  const shL=step(shMid,perp+180,B.shoulderHalf), shR=step(shMid,perp,B.shoulderHalf);
+  const neck=step(shMid,k.torso,B.neck), head=step(neck,k.torso,B.headR);
+  const A=armIK(shL, P(shMid.x+k.hL.x, shMid.y+k.hL.y), k.bL);
+  const Bm=armIK(shR, P(shMid.x+k.hR.x, shMid.y+k.hR.y), k.bR);
+  const hand=(wr,el,kk)=>{ const a=Math.atan2(wr.y-el.y,wr.x-el.x)/D; return step(wr,a,B.hand*kk); };
+  const hdL=hand(A.wrist,A.elbow,A.k), hdR=hand(Bm.wrist,Bm.elbow,Bm.k);
+  const hipL=P(-B.pelvisHalf,0), hipR=P(B.pelvisHalf,0);
+  const L=ik2(hipL,k.ftL,B.thigh,B.shin,(a,b)=> a.x<b.x ? a : b);
+  const R=ik2(hipR,k.ftR,B.thigh,B.shin,(a,b)=> a.x>b.x ? a : b);
+  return { hipMid, shMid, shL, shR, neck, head,
+           elL:A.elbow, wrL:A.wrist, elR:Bm.elbow, wrR:Bm.wrist, hdL, hdR,
+           hipL, hipR, knL:L.joint, anL:L.end, knR:R.joint, anR:R.end };
+}
+
+/* every length is normalised by the torso, which a camera measures far more
+   reliably than standing height, and which removes distance from the maths */
+function features(J){
+  const torso = segAng(J.hipMid, J.shMid);
+  const S = Math.hypot(J.shMid.x-J.hipMid.x, J.shMid.y-J.hipMid.y) || 1;
+  const rel = (a) => wrap(a-torso);
+  const span = Math.abs(J.anR.x - J.anL.x);
+  return {
+    armL: rel(segAng(J.shL,J.elL)), armR: rel(segAng(J.shR,J.elR)),
+    elbowL: jointAng(J.shL,J.elL,J.wrL), elbowR: jointAng(J.shR,J.elR,J.wrR),
+    wristL: (J.wrL.y-J.hipMid.y)/S, wristR: (J.wrR.y-J.hipMid.y)/S,
+    handSpan: Math.abs(J.wrR.x-J.wrL.x)/S,
+    kneeL: jointAng(J.hipL,J.knL,J.anL), kneeR: jointAng(J.hipR,J.knR,J.anR),
+    stance: span/S,
+    sink: (J.hipMid.y - Math.min(J.anL.y,J.anR.y))/S,
+    shift: span > 0.06*S ? (J.hipMid.x - Math.min(J.anL.x,J.anR.x))/span : 0.5,
+    lift: Math.abs(J.anL.y-J.anR.y)/S,
+    lean: wrap(torso-90),
+  };
+}
+
+const CHECKS = [
+  { key:'armL',   label:'Left arm',      tol:26,   w:1.0, kind:'deg',  leg:false },
+  { key:'armR',   label:'Right arm',     tol:26,   w:1.0, kind:'deg',  leg:false },
+  { key:'elbowL', label:'Left elbow',    tol:30,   w:0.6, kind:'deg',  leg:false },
+  { key:'elbowR', label:'Right elbow',   tol:30,   w:0.6, kind:'deg',  leg:false },
+  { key:'wristL', label:'Left hand height',  tol:0.45, w:1.1, kind:'norm', leg:false },
+  { key:'wristR', label:'Right hand height', tol:0.45, w:1.1, kind:'norm', leg:false },
+  { key:'handSpan', label:'Hand separation', tol:0.55, w:0.6, kind:'norm', leg:false },
+  { key:'lean',   label:'Upright spine', tol:12,   w:1.2, kind:'deg',  leg:false },
+  { key:'kneeL',  label:'Left knee bend',  tol:22, w:0.9, kind:'deg',  leg:true },
+  { key:'kneeR',  label:'Right knee bend', tol:22, w:0.9, kind:'deg',  leg:true },
+  { key:'stance', label:'Stance width',  tol:0.42, w:0.8, kind:'norm', leg:true },
+  { key:'sink',   label:'Sinking',       tol:0.11, w:0.9, kind:'norm', leg:true },
+  { key:'shift',  label:'Weight placement', tol:0.26, w:1.3, kind:'norm', leg:true },
+  { key:'lift',   label:'Foot lift',     tol:0.30, w:0.7, kind:'norm', leg:true },
+];
+
+function poseScore(user, target, legsValid=true){
+  let num=0, den=0; const per={};
+  for(const c of CHECKS){
+    if(c.leg && !legsValid) continue;
+    const u=user[c.key], t=target[c.key];
+    if(!isFinite(u)||!isFinite(t)) continue;
+    const err = c.kind==='deg' ? Math.abs(wrap(u-t)) : Math.abs(u-t);
+    const s = 100*Math.exp(-Math.pow(err/c.tol,2));
+    per[c.key]=s; num+=s*c.w; den+=c.w;
+  }
+  return { score: den?num/den:0, per };
+}
+/* raw scores floor near 45 even for unrelated postures, so stretch for display */
+const show = (raw) => clamp(Math.round((raw-40)*100/58), 0, 100);
+
+function lerpKF(a,b,u){
+  const e = u<0.5 ? 2*u*u : 1-Math.pow(-2*u+2,2)/2;
+  const mix=(p,q)=>({x:p.x+(q.x-p.x)*e, y:p.y+(q.y-p.y)*e});
+  return {
+    torso: a.torso + wrap(b.torso-a.torso)*e,
+    hL: mix(a.hL,b.hL), hR: mix(a.hR,b.hR),
+    bL: a.bL+(b.bL-a.bL)*e, bR: a.bR+(b.bR-a.bR)*e,
+    ftL: mix(a.ftL,b.ftL), ftR: mix(a.ftR,b.ftR),
+    breath: e<0.5 ? a.breath : b.breath,
+  };
+}
+
+/* ==========================================================================
+   3. RENDERER — ink-brush coach figure, breath ring, silk trail, your outline
+   ========================================================================== */
+const cv = document.getElementById('coach');
+const ctx = cv.getContext('2d');
+let CW=0, CH=0, DPR=1;
+
+function sizeCanvas(){
+  DPR = Math.min(window.devicePixelRatio||1, 2);
+  const r = cv.getBoundingClientRect();
+  CW = Math.max(1, Math.round(r.width)); CH = Math.max(1, Math.round(r.height));
+  cv.width = CW*DPR; cv.height = CH*DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+new ResizeObserver(sizeCanvas).observe(cv);
+
+/* map body-unit coordinates (y up) to canvas pixels (y down) */
+function makeView(J){
+  const top = Math.max(J.head.y + BODY.headR, J.wrL.y, J.wrR.y, J.shMid.y);
+  const bot = Math.min(J.anL.y, J.anR.y) - 0.03;
+  const xs = [J.hipMid.x, J.anL.x, J.anR.x, J.wrL.x, J.wrR.x];
+  const cx = (Math.min(...xs)+Math.max(...xs))/2;
+  const h = Math.max(0.6, top-bot);
+  const scale = Math.min(CH*0.80/h, CW*0.72/0.90);
+  return { scale, ox: CW/2 - cx*scale, oy: CH*0.90 + bot*scale };
+}
+const toPx = (v,p) => P(v.ox + p.x*v.scale, v.oy - p.y*v.scale);
+
+/* a tapered stroke with a slight bow, so limbs read as brushed rather than drawn */
+function ink(a, b, w0, w1, bow=0.06){
+  const dx=b.x-a.x, dy=b.y-a.y, L=Math.hypot(dx,dy)||1;
+  const nx=-dy/L, ny=dx/L, mx=(a.x+b.x)/2+nx*L*bow, my=(a.y+b.y)/2+ny*L*bow;
+  ctx.beginPath();
+  ctx.moveTo(a.x+nx*w0, a.y+ny*w0);
+  ctx.quadraticCurveTo(mx+nx*(w0+w1)/2, my+ny*(w0+w1)/2, b.x+nx*w1, b.y+ny*w1);
+  ctx.lineTo(b.x-nx*w1, b.y-ny*w1);
+  ctx.quadraticCurveTo(mx-nx*(w0+w1)/2, my-ny*(w0+w1)/2, a.x-nx*w0, a.y-ny*w0);
+  ctx.closePath(); ctx.fill();
+}
+
+function drawCoach(J, view, breathT, phase){
+  const p = {}; for(const k in J) p[k] = toPx(view, J[k]);
+  const s = view.scale;
+  const groundY = view.oy;
+
+  /* ground: a single dry brush line under the feet */
+  ctx.save();
+  const gx0 = Math.min(p.anL.x, p.anR.x) - s*0.14, gx1 = Math.max(p.anL.x, p.anR.x) + s*0.14;
+  const grd = ctx.createLinearGradient(gx0,0,gx1,0);
+  grd.addColorStop(0,'rgba(140,154,144,0)'); grd.addColorStop(.5,'rgba(140,154,144,.32)'); grd.addColorStop(1,'rgba(140,154,144,0)');
+  ctx.fillStyle = grd; ctx.fillRect(gx0, groundY, gx1-gx0, 1.4);
+  ctx.restore();
+
+  /* breath ring around the lower belly */
+  const dan = toPx(view, P(J.hipMid.x, J.hipMid.y + 0.055));
+  const r0 = s*0.20, r1 = s*0.31;
+  const rr = phase==='in' ? r0 + (r1-r0)*breathT : r1 - (r1-r0)*breathT;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(201,162,74,.38)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(dan.x, dan.y, rr, 0, Math.PI*2); ctx.stroke();
+  ctx.fillStyle = 'rgba(201,162,74,.55)';
+  ctx.font = `${Math.round(s*0.07)}px "Cormorant Garamond", serif`;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(phase==='in' ? '吸' : '呼', dan.x, dan.y - rr - s*0.055);
+  ctx.restore();
+
+  /* the figure */
+  ctx.save();
+  ctx.shadowColor = 'rgba(200,80,60,.35)'; ctx.shadowBlur = s*0.05;
+  ctx.fillStyle = '#C8503C';
+
+  /* torso as a single filled sweep from the hips to the shoulders */
+  ctx.beginPath();
+  ctx.moveTo(p.hipL.x - s*0.012, p.hipL.y);
+  ctx.quadraticCurveTo(p.shL.x - s*0.02, (p.hipL.y+p.shL.y)/2, p.shL.x, p.shL.y);
+  ctx.lineTo(p.shR.x, p.shR.y);
+  ctx.quadraticCurveTo(p.shR.x + s*0.02, (p.hipR.y+p.shR.y)/2, p.hipR.x + s*0.012, p.hipR.y);
+  ctx.closePath(); ctx.fill();
+
+  /* limbs, thick at the root and thin at the tip */
+  const W = (f) => s*f;
+  ink(p.hipL, p.knL, W(.030), W(.024)); ink(p.knL, p.anL, W(.024), W(.014), 0.03);
+  ink(p.hipR, p.knR, W(.030), W(.024)); ink(p.knR, p.anR, W(.024), W(.014), 0.03);
+  ink(p.shL, p.elL, W(.023), W(.018)); ink(p.elL, p.wrL, W(.018), W(.011), 0.04);
+  ink(p.shR, p.elR, W(.023), W(.018)); ink(p.elR, p.wrR, W(.018), W(.011), 0.04);
+
+  /* feet */
+  const foot = (an, dir) => { ctx.beginPath(); ctx.ellipse(an.x + dir*s*0.022, an.y + s*0.004, s*0.036, s*0.012, 0, 0, Math.PI*2); ctx.fill(); };
+  foot(p.anL, -1); foot(p.anR, 1);
+  /* hands */
+  ctx.beginPath(); ctx.arc(p.hdL.x, p.hdL.y, s*0.019, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(p.hdR.x, p.hdR.y, s*0.019, 0, Math.PI*2); ctx.fill();
+  /* neck + head */
+  ink(p.shMid, p.neck, W(.020), W(.016), 0);
+  ctx.beginPath(); ctx.arc(p.head.x, p.head.y, s*BODY.headR, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+  return p;
+}
+
+/* silk trail behind whichever hand is leading */
+let trail = [];
+function drawTrail(){
+  if(trail.length<3) return;
+  ctx.save();
+  for(let i=1;i<trail.length;i++){
+    const a=trail[i-1], b=trail[i], t=i/trail.length;
+    ctx.strokeStyle = `rgba(228,105,79,${(t*t*0.5).toFixed(3)})`;
+    ctx.lineWidth = 1 + t*3.2; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+/* your own figure, hip-aligned and torso-scaled onto the coach so the gap is literal */
+const GHOST_LINKS = [['shL','shR'],['shL','elL'],['elL','wrL'],['shR','elR'],['elR','wrR'],
+  ['shMid','hipMid'],['hipL','hipR'],['hipL','knL'],['knL','anL'],['hipR','knR'],['knR','anR']];
+function drawGhost(U, view, coachPx){
+  const S = Math.hypot(U.shMid.x-U.hipMid.x, U.shMid.y-U.hipMid.y);
+  if(!(S>1e-4)) return;
+  const k = (BODY.spine*view.scale)/S;
+  const map = (q) => P(coachPx.hipMid.x + (q.x-U.hipMid.x)*k, coachPx.hipMid.y - (q.y-U.hipMid.y)*k);
+  const g = {}; for(const key in U) if(U[key] && isFinite(U[key].x)) g[key]=map(U[key]);
+  ctx.save();
+  ctx.strokeStyle='rgba(99,192,154,.85)'; ctx.lineWidth=2.2; ctx.lineCap='round'; ctx.lineJoin='round';
+  ctx.beginPath();
+  for(const [a,b] of GHOST_LINKS){ if(g[a]&&g[b]){ ctx.moveTo(g[a].x,g[a].y); ctx.lineTo(g[b].x,g[b].y); } }
+  ctx.stroke();
+  ctx.fillStyle='rgba(99,192,154,.95)';
+  for(const key of ['wrL','wrR','anL','anR','shMid']) if(g[key]){ ctx.beginPath(); ctx.arc(g[key].x,g[key].y,3,0,Math.PI*2); ctx.fill(); }
+  if(g.head){ ctx.beginPath(); ctx.arc(g.head.x,g.head.y, BODY.headR*view.scale*0.9, 0, Math.PI*2); ctx.stroke(); }
+  ctx.restore();
+}
+
+/* ==========================================================================
+   4. CAMERA + POSE
+   ========================================================================== */
+const vid = document.getElementById('vid');
+let landmarker=null, stream=null, hasCam=false, lastVideoTime=-1, userJ=null, userFeat=null, legsValid=false, personSeen=false;
+
+async function startCamera(){
+  stream = await navigator.mediaDevices.getUserMedia({
+    video:{ facingMode:'user', width:{ideal:640}, height:{ideal:480} }, audio:false });
+  vid.srcObject = stream;
+  await vid.play();
+  const { PoseLandmarker, FilesetResolver } = await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14");
+  const fs = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm");
+  landmarker = await PoseLandmarker.createFromOptions(fs, {
+    baseOptions:{ modelAssetPath:"https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task", delegate:"GPU" },
+    runningMode:"VIDEO", numPoses:1, minPoseDetectionConfidence:0.5, minTrackingConfidence:0.5 });
+  hasCam = true;
+}
+
+const LMI = { shL:11, shR:12, elL:13, elR:14, wrL:15, wrR:16, hipL:23, hipR:24, knL:25, knR:26, anL:27, anR:28 };
+function readPose(now){
+  if(!landmarker || vid.readyState < 2) return;
+  if(vid.currentTime === lastVideoTime) return;
+  lastVideoTime = vid.currentTime;
+  let res; try{ res = landmarker.detectForVideo(vid, now); }catch(e){ return; }
+  const lm = res && res.landmarks && res.landmarks[0];
+  if(!lm){ personSeen=false; return; }
+  /* landmark x/y are normalised to a non-square frame, so x is rescaled by the
+     aspect ratio to make the space isotropic before any angle is measured.
+     x is mirrored so the coach reads as your reflection: your left limb stays
+     on the left of the screen. */
+  const asp = (vid.videoWidth||4)/(vid.videoHeight||3);
+  const g = (i) => ({ x:(1-lm[i].x)*asp, y:1-lm[i].y, v:(lm[i].visibility ?? 1) });
+  const J = {}; for(const k in LMI) J[k]=g(LMI[k]);
+  const mid = (a,b) => P((a.x+b.x)/2,(a.y+b.y)/2);
+  J.hipMid = mid(J.hipL,J.hipR); J.shMid = mid(J.shL,J.shR);
+  J.head = mid(g(7), g(8)); J.neck = J.shMid;
+  J.hdL = J.wrL; J.hdR = J.wrR;
+  const core = [J.shL,J.shR,J.hipL,J.hipR].reduce((a,q)=>a+q.v,0)/4;
+  personSeen = core > 0.55;
+  legsValid = Math.min(J.anL.v, J.anR.v, J.knL.v, J.knR.v) > 0.45;
+  if(!personSeen) return;
+  userJ = J; userFeat = features(J);
+}
+
+/* ==========================================================================
+   5. PLAYER + SESSION
+   ========================================================================== */
+const el = (id)=>document.getElementById(id);
+const S = {
+  mode:'learn', speed:0.8, voice:true, ghost:true, pip:false,
+  postureIx:0, playing:false, seq:[], idx:0, phase:'glide', t:0, spoke:-1,
+  countdown:0, session:null, prevKF:NEUTRAL,
+};
+
+function buildSequence(){
+  S.seq = [];
+  if(S.mode==='learn'){
+    const m = FORM[S.postureIx];
+    m.frames.forEach((f,i)=>S.seq.push({ m:S.postureIx, f:i, kf:f }));
+  } else {
+    FORM.forEach((m,mi)=>m.frames.forEach((f,fi)=>S.seq.push({ m:mi, f:fi, kf:f })));
+  }
+  S.idx=0; S.phase='glide'; S.t=0; S.spoke=-1; S.prevKF=NEUTRAL;
+}
+
+function newSession(){
+  S.session = {
+    started: Date.now(), checkpoints: [], live: 0,
+    tempoIn:0, tempoAll:0, headH:[], hipX:[], accel:[], leanSum:0, leanN:0,
+    lastWr:null, lastVel:null, lastT:0, sample:null,
+  };
+}
+
+/* the coach pose right now */
+function coachNow(){
+  const cur = S.seq[S.idx];
+  if(!cur) return NEUTRAL;
+  if(S.phase==='hold') return cur.kf;
+  const dur = Math.max(0.05, cur.kf.glide/S.speed);
+  return lerpKF(S.prevKF, cur.kf, clamp(S.t/dur,0,1));
+}
+function phaseProgress(){
+  const cur=S.seq[S.idx]; if(!cur) return 0;
+  const dur = S.phase==='hold' ? cur.kf.hold/S.speed : cur.kf.glide/S.speed;
+  return clamp(S.t/Math.max(0.05,dur),0,1);
+}
+
+function advance(dt){
+  const cur = S.seq[S.idx]; if(!cur) return;
+  S.t += dt;
+  const dur = (S.phase==='hold' ? cur.kf.hold : cur.kf.glide)/S.speed;
+  if(S.t < dur) return;
+  S.t = 0;
+  if(S.phase==='glide'){
+    S.phase='hold';
+    if(S.mode==='practice') S.session.sample = { m:cur.m, f:cur.f, sum:0, n:0, per:{} };
+    speakCue(cur);
+  } else {
+    if(S.mode==='practice' && S.session.sample){
+      const s=S.session.sample;
+      if(s.n>0){ const per={}; for(const k in s.per) per[k]=s.per[k]/s.n;
+        S.session.checkpoints.push({ m:s.m, f:s.f, score:s.sum/s.n, per }); }
+      S.session.sample=null;
+    }
+    S.prevKF = cur.kf; S.phase='glide'; S.idx++;
+    if(S.idx >= S.seq.length){
+      if(S.mode==='learn'){ S.idx=0; }
+      else { finish(); return; }
+    }
+    updateChrome();
+  }
+}
+
+function speakCue(cur){
+  const m=FORM[cur.m];
+  el('cueText').textContent = cur.kf.cue || m.idea;
+  if(!S.voice || !('speechSynthesis' in window)) return;
+  const key = cur.m*100+cur.f; if(key===S.spoke) return; S.spoke=key;
+  const text = (cur.f===0 ? m.name + '. ' : '') + (cur.kf.cue||'');
+  try{ const u=new SpeechSynthesisUtterance(text); u.rate=0.85; u.pitch=0.95;
+    speechSynthesis.cancel(); speechSynthesis.speak(u); }catch(e){}
+}
+
+/* Accumulate the live scoring signals.
+   Landmark positions jitter frame to frame, so every quantity that gets
+   differentiated is smoothed first — otherwise the noise, not the person,
+   decides the continuity score. Tempo is judged against the coach's own speed
+   rather than a fixed band, which means the pauses at each posture read as
+   correct stillness instead of as stalling, and choosing a brisker pace does
+   not automatically cost marks. */
+const EMA = (prev, v, a) => prev===undefined ? v : prev*(1-a) + v*a;
+
+function accumulate(target, dt, now, CJ){
+  const ss=S.session; if(!ss || !userFeat || !personSeen) return;
+  const r = poseScore(userFeat, target, legsValid);
+  ss.live = ss.live ? ss.live*0.85 + r.score*0.15 : r.score;
+  if(ss.sample){ ss.sample.sum += r.score; ss.sample.n++;
+    for(const k in r.per) ss.sample.per[k]=(ss.sample.per[k]||0)+r.per[k]; }
+
+  const Su = Math.hypot(userJ.shMid.x-userJ.hipMid.x, userJ.shMid.y-userJ.hipMid.y)||1;
+  /* hands measured relative to the hips, in torso lengths, so walking about
+     the room does not register as tai chi */
+  const wrU = P(((userJ.wrL.x+userJ.wrR.x)/2 - userJ.hipMid.x)/Su,
+                ((userJ.wrL.y+userJ.wrR.y)/2 - userJ.hipMid.y)/Su);
+  const wrC = P(((CJ.wrL.x+CJ.wrR.x)/2 - CJ.hipMid.x)/BODY.spine,
+                ((CJ.wrL.y+CJ.wrR.y)/2 - CJ.hipMid.y)/BODY.spine);
+  ss.sU = { x:EMA(ss.sU&&ss.sU.x, wrU.x, 0.3), y:EMA(ss.sU&&ss.sU.y, wrU.y, 0.3) };
+  ss.sC = { x:EMA(ss.sC&&ss.sC.x, wrC.x, 0.3), y:EMA(ss.sC&&ss.sC.y, wrC.y, 0.3) };
+
+  if(ss.pU && dt>0.005){
+    const vU = Math.hypot(ss.sU.x-ss.pU.x, ss.sU.y-ss.pU.y)/dt;
+    const vC = Math.hypot(ss.sC.x-ss.pC.x, ss.sC.y-ss.pC.y)/dt;
+    ss.vEMA = EMA(ss.vEMA, vU, 0.12);
+    ss.vCoach = EMA(ss.vCoach, vC, 0.12);
+    const ratio = (ss.vEMA + 0.02) / (ss.vCoach + 0.02);
+    ss.tempoAll++; if(ratio>=0.45 && ratio<=2.0) ss.tempoIn++;
+    if(ss.lastVel!==null && ss.lastVel!==undefined) ss.accel.push(Math.abs(vU-ss.lastVel)/dt);
+    ss.lastVel = vU;
+  }
+  ss.pU = ss.sU; ss.pC = ss.sC;
+
+  ss.hH = EMA(ss.hH, (userJ.shMid.y-Math.min(userJ.anL.y,userJ.anR.y))/Su, 0.25);
+  ss.hX = EMA(ss.hX, userJ.hipMid.x/Su, 0.25);
+  ss.headH.push(ss.hH); ss.hipX.push(ss.hX);
+  ss.leanSum += Math.abs(userFeat.lean); ss.leanN++;
+}
+
+const std = (a) => { if(a.length<4) return 0; const m=a.reduce((x,y)=>x+y,0)/a.length;
+  return Math.sqrt(a.reduce((x,y)=>x+(y-m)*(y-m),0)/a.length); };
+
+/* ==========================================================================
+   6. MAIN LOOP
+   ========================================================================== */
+let lastFrame = performance.now();
+function loop(now){
+  requestAnimationFrame(loop);
+  const dt = Math.min(0.06, (now-lastFrame)/1000); lastFrame = now;
+  if(!el('scStage').classList.contains('on')) return;
+  if(hasCam) readPose(now);
+
+  if(S.countdown>0){
+    S.countdown -= dt;
+    el('veilBig').textContent = Math.max(1, Math.ceil(S.countdown));
+    el('veilMsg').textContent = personSeen ? (legsValid ? 'Ready. Follow the coach.' : 'Step back so your feet are in the frame.')
+                                           : 'Stand where your whole body fits in the frame.';
+    if(S.countdown<=0){ el('veil').classList.remove('on'); S.playing=true; }
+  } else if(S.playing){
+    advance(dt);
+  }
+
+  const k = coachNow();
+  const J = fk(k);
+  const view = makeView(J);
+  const target = features(J);
+
+  if(S.mode==='practice' && S.playing) accumulate(target, dt, now, J);
+
+  ctx.clearRect(0,0,CW,CH);
+  const lead = J.wrL.y > J.wrR.y ? J.wrL : J.wrR;
+  const leadPx = toPx(view, lead);
+  if(S.playing || S.countdown>0){ trail.push(leadPx); if(trail.length>26) trail.shift(); }
+  drawTrail();
+  const bt = phaseProgress();
+  const coachPx = drawCoach(J, view, S.phase==='hold' ? 1 : bt, k.breath||'in');
+  if(S.ghost && userJ && personSeen) drawGhost(userJ, view, coachPx);
+
+  if(S.mode==='practice'){
+    const ss=S.session;
+    const live = ss ? show(ss.live) : 0;
+    el('matchBar').style.width = live+'%';
+    el('matchBar').style.background = live>=70?'#63C09A':live>=45?'#C9A24A':'#C8503C';
+    el('matchNum').textContent = personSeen ? live : '—';
+    const ratio = ss && ss.vEMA!==undefined ? (ss.vEMA+0.02)/((ss.vCoach||0)+0.02) : 1;
+    const dot=el('tempoDot');
+    let msg='with the coach', cls='ok';
+    if(!personSeen){ msg='step into the frame'; cls=''; }
+    else if(ratio<0.45){ msg='you are behind the coach'; cls='warn'; }
+    else if(ratio>2.0){ msg='slower — let it stretch out'; cls='warn'; }
+    dot.className = cls;
+    el('tempoText').textContent = legsValid ? msg : 'feet not visible — legs not scored';
+  }
+}
+requestAnimationFrame(loop);
+
+/* ==========================================================================
+   7. CHROME + NAVIGATION
+   ========================================================================== */
+function screen(id){
+  for(const s of document.querySelectorAll('.screen')) s.classList.toggle('on', s.id===id);
+}
+
+function updateChrome(){
+  const cur = S.seq[S.idx] || S.seq[S.seq.length-1];
+  const m = FORM[cur.m];
+  el('stName').textContent = m.name;
+  el('stPinyin').textContent = m.pinyin;
+  el('stChip').textContent = S.mode==='learn' ? 'looping' : `${cur.m+1} / ${FORM.length}`;
+  el('cueText').textContent = cur.kf.cue || m.idea;
+  const cells = el('sealCol').children;
+  for(let i=0;i<cells.length;i++){
+    cells[i].classList.toggle('now', i===cur.m);
+    cells[i].classList.toggle('done', i<cur.m);
+  }
+  if(S.mode==='learn'){
+    el('teachIdea').textContent = m.idea;
+    el('teachCues').innerHTML = m.frames.map(f=>`<li>${f.cue}</li>`).join('');
+  }
+}
+
+function buildSealColumn(){
+  el('sealCol').innerHTML = FORM.map(m=>`<b title="${m.name}">${m.han}</b>`).join('');
+}
+
+function buildHome(){
+  el('postureOpts').innerHTML = FORM.map((m,i)=>
+    `<button class="opt" data-posture="${i}" aria-pressed="${i===0}">${m.han} ${m.name.split(' ')[0]}</button>`).join('');
+  el('indexList').innerHTML = FORM.map(m=>
+    `<li><span class="han">${m.han}</span><span class="en">${m.name}</span><span class="py">${m.pinyin}</span></li>`).join('');
+  el('postureOpts').addEventListener('click', e=>{
+    const b=e.target.closest('[data-posture]'); if(!b) return;
+    S.postureIx = +b.dataset.posture;
+    for(const o of el('postureOpts').children) o.setAttribute('aria-pressed', o===b);
+  });
+  el('speedOpts').addEventListener('click', e=>{
+    const b=e.target.closest('[data-speed]'); if(!b) return;
+    S.speed = +b.dataset.speed;
+    for(const o of el('speedOpts').children) o.setAttribute('aria-pressed', o===b);
+  });
+  for(const c of document.querySelectorAll('.mode-card')){
+    c.addEventListener('click', ()=>{
+      S.mode = c.dataset.mode;
+      for(const o of document.querySelectorAll('.mode-card')) o.setAttribute('aria-pressed', o===c);
+      el('fieldPosture').style.display = S.mode==='learn' ? '' : 'none';
+      el('btnBegin').textContent = S.mode==='learn' ? 'Start camera and study' : 'Start camera and run the form';
+    });
+  }
+  const toggle = (id, key) => el(id).addEventListener('click', ()=>{
+    S[key] = el(id).getAttribute('aria-pressed')!=='true';
+    el(id).setAttribute('aria-pressed', S[key]);
+    if(key==='pip') el('pip').classList.toggle('hide', !S.pip);
+  });
+  toggle('optVoice','voice'); toggle('optSkel','ghost'); toggle('optPip','pip');
+}
+
+async function begin(withCam){
+  el('btnBegin').disabled = true;
+  if(withCam && !hasCam){
+    el('btnBegin').textContent = 'Loading the pose model…';
+    try{ await startCamera(); }
+    catch(err){
+      el('camNote').textContent = 'The camera could not start: ' + (err && err.message ? err.message : err) +
+        '. You can still watch the coach without it — the form is scored only when the camera is running.';
+      el('camNote').style.color = '#E4694F';
+      el('btnBegin').disabled = false; el('btnBegin').textContent = 'Try the camera again';
+      return;
+    }
+  }
+  el('btnBegin').disabled = false;
+  el('btnBegin').textContent = S.mode==='learn' ? 'Start camera and study' : 'Start camera and run the form';
+  el('pip').classList.toggle('hide', !(S.pip && hasCam));
+  const scoring = (S.mode==='practice' && hasCam);
+  el('matchRow').style.display = scoring ? '' : 'none';
+  el('tempoRow').style.display = scoring ? '' : 'none';
+  el('teach').style.display = S.mode==='learn' ? '' : 'none';
+  buildSequence(); trail=[];
+  if(S.mode==='practice'){ newSession(); S.countdown = 3.9; el('veil').classList.add('on'); S.playing=false; }
+  else { el('veil').classList.remove('on'); S.countdown=0; S.playing = true; }
+  el('btnPlay').textContent = 'Pause';
+  screen('scStage'); sizeCanvas(); updateChrome();
+}
+
+el('btnBegin').addEventListener('click', ()=>begin(true));
+el('btnNoCam').addEventListener('click', ()=>begin(false));
+el('btnBack').addEventListener('click', ()=>{ S.playing=false; try{speechSynthesis.cancel();}catch(e){} screen('scHome'); });
+el('btnBack2').addEventListener('click', ()=>screen('scHome'));
+el('btnHome').addEventListener('click', ()=>screen('scHome'));
+el('btnAgain').addEventListener('click', ()=>{ S.mode='practice'; begin(hasCam); });
+el('btnPlay').addEventListener('click', ()=>{
+  S.playing=!S.playing; el('btnPlay').textContent = S.playing?'Pause':'Play';
+  if(!S.playing) try{speechSynthesis.cancel();}catch(e){}
+});
+el('btnPrev').addEventListener('click', ()=>jump(-1));
+el('btnNext').addEventListener('click', ()=>jump(1));
+function jump(d){
+  if(S.mode==='learn'){
+    S.postureIx = (S.postureIx + d + FORM.length) % FORM.length;
+    for(const o of el('postureOpts').children) o.setAttribute('aria-pressed', +o.dataset.posture===S.postureIx);
+    buildSequence(); trail=[]; S.playing=true; el('btnPlay').textContent='Pause';
+  } else {
+    const curM = S.seq[S.idx] ? S.seq[S.idx].m : 0;
+    const tgt = clamp(curM + d, 0, FORM.length-1);
+    const i = S.seq.findIndex(x=>x.m===tgt);
+    if(i>=0){ S.prevKF = i>0 ? S.seq[i-1].kf : NEUTRAL; S.idx=i; S.phase='glide'; S.t=0; S.spoke=-1; trail=[]; }
+  }
+  updateChrome();
+}
+
+/* ==========================================================================
+   8. REPORT
+   ========================================================================== */
+const TIPS = {
+  armL:'Your left arm keeps finding a different line from the coach. Set the arm shape first while standing still, then add the step.',
+  armR:'Your right arm keeps finding a different line from the coach. Set the arm shape first while standing still, then add the step.',
+  elbowL:'Your left elbow straightens too much. Keep a soft bend so the joint stays springy rather than locked.',
+  elbowR:'Your right elbow straightens too much. Keep a soft bend so the joint stays springy rather than locked.',
+  wristL:'Your left hand sits at the wrong height. Watch where the coach\'s hand stops — usually the shoulder, the eyes, or the navel, never in between.',
+  wristR:'Your right hand sits at the wrong height. Watch where the coach\'s hand stops — usually the shoulder, the eyes, or the navel, never in between.',
+  handSpan:'Your hands travel too close together or too far apart. Keep the space between them the size of the ball you are holding.',
+  lean:'You lean into the movement instead of sending the weight through the legs. Keep the spine vertical and let the hips do the travelling.',
+  kneeL:'Your left knee stays too straight. Bend it and keep it bent — the height of the body should barely change once you have sunk.',
+  kneeR:'Your right knee stays too straight. Bend it and keep it bent — the height of the body should barely change once you have sunk.',
+  stance:'Your feet are too close together or too wide. A bow stance is about one and a half shoulder widths, not a lunge.',
+  sink:'You are standing too tall. Sink at the start and hold that height for the whole form rather than rising between postures.',
+  shift:'This is the big one: your weight stays in the middle instead of settling clearly onto one leg. Move the hips over the loaded foot before the hands go anywhere.',
+  lift:'Your foot lifts when it should stay rooted, or stays down when the coach lifts it. Empty the leg completely before it moves.',
+};
+const VERDICTS = [
+  [85,'The shape is there. Now work on making it look like nothing is happening.'],
+  [70,'Solid form. The postures land; the travel between them is where the work is.'],
+  [55,'The outline is right and the detail is coming. Slow down further before adding anything.'],
+  [40,'You are following, which is the hard part. Pick one posture and study it on its own.'],
+  [0,'Early days. Use study mode on a single posture until the shape is automatic.'],
+];
+
+function finish(){
+  S.playing=false; try{speechSynthesis.cancel();}catch(e){}
+  const ss = S.session;
+  if(!ss || ss.checkpoints.length===0){
+    el('repScore').textContent='—';
+    el('repVerdict').textContent='No posture was measured. The camera needs to see your whole body, head to feet, for the form to be scored.';
+    el('repPostures').innerHTML=''; el('repChecks').innerHTML=''; el('repTip').textContent='Move further from the camera and run the form again.';
+    screen('scReport'); return;
+  }
+  /* per-posture */
+  const byM = new Map();
+  for(const c of ss.checkpoints){ if(!byM.has(c.m)) byM.set(c.m,[]); byM.get(c.m).push(c.score); }
+  const postures = [...byM.entries()].map(([m,arr])=>({ m, score: show(arr.reduce((a,b)=>a+b,0)/arr.length) }))
+    .sort((a,b)=>a.m-b.m);
+  const postureAvg = postures.reduce((a,p)=>a+p.score,0)/postures.length;
+
+  /* per-check */
+  const acc={}, cnt={};
+  for(const c of ss.checkpoints) for(const k in c.per){ acc[k]=(acc[k]||0)+c.per[k]; cnt[k]=(cnt[k]||0)+1; }
+  const checks = CHECKS.filter(c=>cnt[c.key]).map(c=>({ key:c.key, label:c.label, score: show(acc[c.key]/cnt[c.key]) }))
+    .sort((a,b)=>a.score-b.score);
+
+  /* movement quality */
+  const tempo = ss.tempoAll ? Math.round(100*ss.tempoIn/ss.tempoAll) : 0;
+  const bob = std(ss.headH), sway = std(ss.hipX);
+  const still = Math.round(100*Math.exp(-Math.pow(bob/0.055,2)*0.6 - Math.pow(sway/0.30,2)*0.4));
+  const jerk = ss.accel.length ? ss.accel.slice().sort((a,b)=>a-b)[Math.floor(ss.accel.length*0.9)] : 0;
+  const smooth = Math.round(100*Math.exp(-Math.pow(jerk/7.0,2)));
+  const lean = ss.leanN ? ss.leanSum/ss.leanN : 0;
+  const upright = Math.round(100*Math.exp(-Math.pow(lean/11,2)));
+
+  const overall = Math.round(0.55*postureAvg + 0.13*tempo + 0.12*still + 0.10*smooth + 0.10*upright);
+
+  el('repWhen').textContent = new Date(ss.started).toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'});
+  el('repScore').textContent = overall;
+  el('repVerdict').textContent = (VERDICTS.find(v=>overall>=v[0])||VERDICTS[VERDICTS.length-1])[1];
+
+  const set=(id,v,note)=>{ el(id).textContent=v; el(id+'Note').textContent=note; };
+  set('repTempo', tempo, tempo>=75?'in the slow band':'drifting fast or stalling');
+  set('repStill', still, still>=75?'level and rooted':'bobbing or swaying');
+  set('repSmooth', smooth, smooth>=75?'continuous':'starts and stops');
+  set('repUpright', upright, upright>=75?`${lean.toFixed(0)}° average lean`:`${lean.toFixed(0)}° average lean`);
+
+  const bar=(label,sub,score)=>`<div class="row"><div class="lbl">${label}${sub?`<small>${sub}</small>`:''}</div>
+    <div class="val num">${score}</div><div class="track"><i style="width:${score}%;background:${score>=70?'#63C09A':score>=45?'#C9A24A':'#C8503C'}"></i></div></div>`;
+  el('repPostures').innerHTML = postures.map(p=>bar(FORM[p.m].name, FORM[p.m].pinyin, p.score)).join('');
+  el('repChecks').innerHTML = checks.slice(0,6).map(c=>bar(c.label,'',c.score)).join('');
+
+  const worst = checks[0];
+  let tip = worst ? (TIPS[worst.key]||'Keep working on the shape of each posture.') : '';
+  if(tempo<70) tip += (ss.vEMA||0) > (ss.vCoach||0)
+    ? ' You are also moving faster than the coach — halve your speed and the shape will improve on its own.'
+    : ' You are also falling behind the coach and stopping between postures — tai chi slows, but it does not stop.';
+  el('repTip').textContent = tip;
+  screen('scReport');
+}
+
+/* ==========================================================================
+   9. BOOT
+   ========================================================================== */
+buildHome(); buildSealColumn(); sizeCanvas();
+el('fieldPosture').style.display = '';
+window.addEventListener('resize', sizeCanvas);
+document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ S.playing=false; el('btnPlay').textContent='Play'; } });
+if('serviceWorker' in navigator) window.addEventListener('load', ()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>

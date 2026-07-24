@@ -1,0 +1,17 @@
+{
+  "name": "Slow Form — tai chi coach",
+  "short_name": "Slow Form",
+  "description": "Eight postures of the Yang-style tai chi short form, demonstrated by an ink-brush coach and scored from your camera on shape, weight, tempo and stillness. Runs entirely on your device.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0E1512",
+  "theme_color": "#0E1512",
+  "categories": ["health", "fitness", "education"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
